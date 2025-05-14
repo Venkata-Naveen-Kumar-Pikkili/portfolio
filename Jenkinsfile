@@ -4,7 +4,7 @@ pipeline {
     environment {
         AWS_REGION = 'us-east-1'
         S3_BUCKET = 'chaithanya-portfolio-web'
-        LAMBDA_CONTACT = 'ContactFormSubmissions'
+        LAMBDA_CONTACT = 'ContactFormSubmit'
         LAMBDA_VISITOR = 'trackVisitor'
         CLOUDFRONT_DIST_ID = 'YOUR_DISTRIBUTION_ID'  // Replace with actual ID
     }
