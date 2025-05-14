@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/Venkata-Naveen-Kumar-Pikkili/portfolio.git'
+                git branch: 'main', url: 'https://github.com/Venkata-Naveen-Kumar-Pikkili/portfolio.git'
             }
         }
 
