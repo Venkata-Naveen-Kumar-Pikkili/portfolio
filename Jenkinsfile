@@ -18,47 +18,78 @@ pipeline {
 
         stage('Package & Deploy Lambda: Contact Form') {
             steps {
-                sh '''
-                mkdir -p build
-                cp lambda/contact/lambda_function.py build/
-                cd build
-                zip contact.zip lambda_function.py
-                aws lambda update-function-code \
-                    --function-name "$LAMBDA_CONTACT" \
-                    --zip-file fileb://contact.zip \
-                    --region "$AWS_REGION"
-                cd ..
-                rm -rf build
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-credentials',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    sh '''
+                    mkdir -p build
+                    cp lambda/contact/lambda_function.py build/
+                    cd build
+                    zip contact.zip lambda_function.py
+
+                    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
+                    aws lambda update-function-code \
+                        --function-name "$LAMBDA_CONTACT" \
+                        --zip-file fileb://contact.zip \
+                        --region "$AWS_REGION"
+
+                    cd ..
+                    rm -rf build
+                    '''
+                }
             }
         }
 
         stage('Package & Deploy Lambda: Visitor Logger') {
             steps {
-                sh '''
-                mkdir -p build
-                cp lambda/track/lambda_function.py build/
-                cd build
-                zip visitor.zip lambda_function.py
-                aws lambda update-function-code \
-                    --function-name "$LAMBDA_VISITOR" \
-                    --zip-file fileb://visitor.zip \
-                    --region "$AWS_REGION"
-                cd ..
-                rm -rf build
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-credentials',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    sh '''
+                    mkdir -p build
+                    cp lambda/track/lambda_function.py build/
+                    cd build
+                    zip visitor.zip lambda_function.py
+
+                    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
+                    aws lambda update-function-code \
+                        --function-name "$LAMBDA_VISITOR" \
+                        --zip-file fileb://visitor.zip \
+                        --region "$AWS_REGION"
+
+                    cd ..
+                    rm -rf build
+                    '''
+                }
             }
         }
 
         stage('Upload Frontend to S3 & Invalidate Cache') {
             steps {
-                sh '''
-                aws s3 sync frontend/ s3://$S3_BUCKET --delete --region "$AWS_REGION"
-                aws cloudfront create-invalidation \
-                    --distribution-id "$CLOUDFRONT_DIST_ID" \
-                    --paths "/*" \
-                    --region "$AWS_REGION"
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-credentials',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    sh '''
+                    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
+                    aws s3 sync frontend/ s3://$S3_BUCKET --delete --region "$AWS_REGION"
+                    aws cloudfront create-invalidation \
+                        --distribution-id "$CLOUDFRONT_DIST_ID" \
+                        --paths "/*" \
+                        --region "$AWS_REGION"
+                    '''
+                }
             }
         }
     }
