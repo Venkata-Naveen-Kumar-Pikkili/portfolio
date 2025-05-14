@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Chaithu-dot/Chaithanya-Portfolio'
+                git 'https://github.com/Venkata-Naveen-Kumar-Pikkili/portfolio.git'
             }
         }
 
